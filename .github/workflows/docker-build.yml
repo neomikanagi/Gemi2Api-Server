@@ -2,14 +2,14 @@ name: Build and Push Docker Image
 
 on:
   push:
-    branches: [ main ]  # 推 main 时自动建
+    branches: [ main ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      packages: write  # 必须加这行！给 GITHUB_TOKEN packages 权限
+      packages: write  # 必须加，给 GITHUB_TOKEN 权限
 
     steps:
     - uses: actions/checkout@v4
@@ -21,13 +21,12 @@ jobs:
       uses: docker/login-action@v3
       with:
         registry: ghcr.io
-        username: ${{ github.actor }}  # 你的 GitHub 用户名
-        password: ${{ secrets.GITHUB_TOKEN }}  # 用默认 token，无需自定义 secret！
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}  # 用默认 token，最安全
 
     - name: Build and push
       uses: docker/build-push-action@v5
       with:
         context: .
-        file: Dockerfile  # zhiyu1998 项目用原 Dockerfile；自建项目也行
         push: true
-        tags: ghcr.io/${{ github.repository_owner }}/你的仓库名:latest  # 改成你的仓库名（小写）
+        tags: ghcr.io/${{ github.repository }}:latest  # 这里自动取仓库名！
