@@ -9,10 +9,15 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      packages: write  # 必须加，给 GITHUB_TOKEN 权限
+      packages: write
 
     steps:
     - uses: actions/checkout@v4
+
+    - name: Lowercase Repository Name
+      id: lowercase
+      run: |
+        echo "repo_lower=$(echo ${{ github.event.repository.name }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
@@ -22,11 +27,11 @@ jobs:
       with:
         registry: ghcr.io
         username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}  # 用默认 token，最安全
+        password: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Build and push
       uses: docker/build-push-action@v5
       with:
         context: .
         push: true
-        tags: ghcr.io/${{ github.repository }}:latest  # 这里自动取仓库名！
+        tags: ghcr.io/${{ github.repository_owner }}/${{ steps.lowercase.outputs.repo_lower }}:latest
