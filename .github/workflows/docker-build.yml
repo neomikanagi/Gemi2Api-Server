@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      packages: write  # 必须，用于 GHCR
+      packages: write  # 必须加这行！给 GITHUB_TOKEN packages 权限
 
     steps:
     - uses: actions/checkout@v4
@@ -22,12 +22,12 @@ jobs:
       with:
         registry: ghcr.io
         username: ${{ github.actor }}  # 你的 GitHub 用户名
-        password: ${{ secrets.GHCR_TOKEN }}  # 用你的 PAT
+        password: ${{ secrets.GITHUB_TOKEN }}  # 用默认 token，无需自定义 secret！
 
     - name: Build and push
       uses: docker/build-push-action@v5
       with:
         context: .
-        file: Dockerfile  # 用原项目 Dockerfile（slim 基础，小镜像）
+        file: Dockerfile  # zhiyu1998 项目用原 Dockerfile；自建项目也行
         push: true
-        tags: ghcr.io/${{ github.repository_owner }}/gemi2api-server:latest
+        tags: ghcr.io/${{ github.repository_owner }}/你的仓库名:latest  # 改成你的仓库名（小写）
